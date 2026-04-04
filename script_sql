@@ -1,0 +1,110 @@
+-- ============================================================
+--  Script SQL - Mobile Money DB
+--  SGBD : MySQL 8.0+
+-- ============================================================
+
+DROP DATABASE IF EXISTS mobile_money_db;
+
+CREATE DATABASE mobile_money_db
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE mobile_money_db;
+
+-- ============================================================
+--  TABLE : CLIENT
+-- ============================================================
+CREATE TABLE CLIENT (
+    id        INT          NOT NULL AUTO_INCREMENT,
+    nom       VARCHAR(100) NOT NULL,
+    prenom    VARCHAR(100) NOT NULL,
+    telephone VARCHAR(20)  NOT NULL,
+    adresse   VARCHAR(255),
+    CONSTRAINT pk_client    PRIMARY KEY (id),
+    CONSTRAINT uq_telephone UNIQUE (telephone)
+);
+
+-- ============================================================
+--  TABLE : COMPTE
+-- ============================================================
+CREATE TABLE COMPTE (
+    id            INT            NOT NULL AUTO_INCREMENT,
+    numero_compte VARCHAR(20)    NOT NULL,
+    solde         DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
+    client_id     INT            NOT NULL,
+    CONSTRAINT pk_compte       PRIMARY KEY (id),
+    CONSTRAINT uq_num_compte   UNIQUE (numero_compte),
+    CONSTRAINT fk_compte_client
+        FOREIGN KEY (client_id)
+        REFERENCES CLIENT(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- ============================================================
+--  TABLE : OPERATION
+-- ============================================================
+CREATE TABLE OPERATION (
+    id                 INT            NOT NULL AUTO_INCREMENT,
+    type_operation     VARCHAR(20)    NOT NULL,
+    montant            DECIMAL(15, 2) NOT NULL,
+    date_operation     DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    compte_source      INT            NOT NULL,
+    compte_destination INT                     DEFAULT NULL,
+    marchand           VARCHAR(150)            DEFAULT NULL,
+    CONSTRAINT pk_operation PRIMARY KEY (id),
+    CONSTRAINT fk_op_source
+        FOREIGN KEY (compte_source)
+        REFERENCES COMPTE(id)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_op_destination
+        FOREIGN KEY (compte_destination)
+        REFERENCES COMPTE(id)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE,
+    CONSTRAINT chk_type_operation
+        CHECK (type_operation IN ('DEPOT', 'RETRAIT', 'TRANSFERT', 'PAIEMENT')),
+    CONSTRAINT chk_montant
+        CHECK (montant > 0)
+);
+
+-- ============================================================
+--  INDEX
+-- ============================================================
+CREATE INDEX idx_telephone     ON CLIENT(telephone);
+CREATE INDEX idx_numero_compte ON COMPTE(numero_compte);
+CREATE INDEX idx_client_id     ON COMPTE(client_id);
+CREATE INDEX idx_op_source     ON OPERATION(compte_source);
+CREATE INDEX idx_op_dest       ON OPERATION(compte_destination);
+CREATE INDEX idx_op_date       ON OPERATION(date_operation);
+CREATE INDEX idx_op_type       ON OPERATION(type_operation);
+
+-- ============================================================
+--  DONNEES DE TEST
+-- ============================================================
+
+INSERT INTO CLIENT (nom, prenom, telephone, adresse) VALUES
+    ('Bathily',  'Cheikh Amala',  '771234567', 'Dakar, Plateau'),
+    ('Faye',  'Mo',    '782345678', 'Dakar, Parcelles'),
+    ('Wone',     'Bachir', '763456789', 'Thies, Centre');
+
+INSERT INTO COMPTE (numero_compte, solde, client_id) VALUES
+    ('MM-00000001', 150000.00, 1),
+    ('MM-00000002',  75000.00, 2),
+    ('MM-00000003',  20000.00, 3);
+
+INSERT INTO OPERATION (type_operation, montant, date_operation, compte_source, compte_destination, marchand) VALUES
+    ('DEPOT',     50000.00, '2026-04-01 09:00:00', 1, NULL, NULL),
+    ('RETRAIT',   10000.00, '2026-04-01 10:30:00', 2, NULL, NULL),
+    ('TRANSFERT', 20000.00, '2026-04-02 14:00:00', 1,    2, NULL),
+    ('PAIEMENT',   5000.00, '2026-04-03 11:15:00', 2, NULL, 'Boutique Chez Moussa');
+
+-- ============================================================
+--  VERIFICATION
+-- ============================================================
+SELECT 'CLIENT'    AS table_name, COUNT(*) AS nb_lignes FROM CLIENT
+UNION ALL
+SELECT 'COMPTE',    COUNT(*) FROM COMPTE
+UNION ALL
+SELECT 'OPERATION', COUNT(*) FROM OPERATION;
