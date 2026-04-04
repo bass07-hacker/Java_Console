@@ -30,16 +30,16 @@ public class Menu {
     private void displayHeader() {
         ConsoleUI.clearScreen();
         System.out.println(ConsoleUI.BOLD_GREEN);
-        System.out.println("╔════════════════════════════════════════════════════════════════════╗");
-        System.out.println("║  __  __  ____  ____  _____  _      ______   __  __   ____   _   _  ║");
-        System.out.println("║ |  \\/  |/ __ \\|  _ \\|_   _|| |    |  ____| |  \\/  | / __ \\ | \\ | | ║");
-        System.out.println("║ | \\  / | |  | | |_) | | |  | |    | |__    | \\  / || |  | ||  \\| | ║");
-        System.out.println("║ | |\\/| | |  | |  _ <  | |  | |    |  __|   | |\\/| || |  | || . ` | ║");
-        System.out.println("║ | |  | | |__| | |_) |_| |_ | |____| |____  | |  | || |__| || |\\  | ║");
-        System.out.println("║ |_|  |_|\\____/|____/|_____||______|______| |_|  |_| \\____/ |_| \\_| ║");
-        System.out.println("║                                                                    ║");
-        System.out.println("║                SÉCURISÉ • RAPIDE • FIABLE • v2.0                   ║");
-        System.out.println("╚════════════════════════════════════════════════════════════════════╝");
+        System.out.println("╔" + "═".repeat(108) + "╗");
+        System.out.println("║ ███╗   ███╗ ██████╗ ██████╗ ██╗██╗     ███████╗    ███╗   ███╗ ██████╗ ███╗   ██╗███████╗██╗   ██╗ ║");
+        System.out.println("║ ████╗ ████║██╔═══██╗██╔══██╗██║██║     ██╔════╝    ████╗ ████║██╔═══██╗████╗  ██║██╔════╝╚██╗ ██╔╝ ║");
+        System.out.println("║ ██╔████╔██║██║   ██║██████╔╝██║██║     █████╗      ██╔████╔██║██║   ██║██╔██╗ ██║█████╗   ╚████╔╝  ║");
+        System.out.println("║ ██║╚██╔╝██║██║   ██║██╔══██╗██║██║     ██╔══╝      ██║╚██╔╝██║██║   ██║██║╚██╗██║██╔══╝    ╚██╔╝   ║");
+        System.out.println("║ ██║ ╚═╝ ██║╚██████╔╝██████╔╝██║███████╗███████╗    ██║ ╚═╝ ██║╚██████╔╝██║ ╚████║███████╗   ██║    ║");
+        System.out.println("║ ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚═╝╚══════╝╚══════╝    ╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝   ╚═╝    ║");
+        System.out.println("║                                                                                                    ║");
+        System.out.println("║                             SÉCURISÉ • RAPIDE • FIABLE • v2.0                                      ║");
+        System.out.println("╚" + "═".repeat(108) + "╝");
         System.out.println(ConsoleUI.RESET);
     }
 

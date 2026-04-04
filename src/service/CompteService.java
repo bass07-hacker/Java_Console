@@ -1,6 +1,6 @@
 package service;
 
-import dao.CompteDAO;
+// import dao.CompteDAO;
 import model.Compte;
 import exception.CompteIntrouvableException;
 

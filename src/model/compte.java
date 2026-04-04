@@ -1,5 +1,5 @@
 package model;
-public class Client {
+public class Compte {
         private int id;
         private int Numero_compte;
         private int solde;
