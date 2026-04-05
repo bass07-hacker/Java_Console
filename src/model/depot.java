@@ -1,37 +1,17 @@
 package model;
-public class Depot {
-    private int Numero_compte;
-    private double montant;
-    private String date;
-    private String type="Depot";
+
+public class Depot extends Operation {
+    private Compte compteDestination;
 
     public Depot() {
+        super("DEPOT");
     }
 
-    public Depot(int Numero_compte, double montant, String date) {
-        this.Numero_compte = Numero_compte;
-        this.montant = montant;
-        this.date = date;
+    public Depot(double montant, Compte compteDestination) {
+        super("DEPOT", montant);
+        this.compteDestination = compteDestination;
     }
 
-    public int getNumero_compte() {
-        return Numero_compte;
-    }
-    public void setNumero_compte(int Numero_compte) {
-        this.Numero_compte = Numero_compte;
-    }
-
-    public double getMontant() {
-        return montant;
-    }
-    public void setMontant(double montant) {
-        this.montant = montant;
-    }
-
-    public String getDate() {
-        return date;
-    }
-    public void setDate(String date) {
-        this.date = date;
-    }
+    public Compte getCompteDestination()                         { return compteDestination; }
+    public void   setCompteDestination(Compte compteDestination) { this.compteDestination = compteDestination; }
 }

@@ -25,7 +25,7 @@ public class ClientDAO {
         } catch (SQLIntegrityConstraintViolationException e) {
             System.out.println("❌ Ce numéro de téléphone est déjà utilisé.");
         } catch (SQLException e) {
-            System.out.println("❌ Erreur lor de l'ajout : " + e.getMessage());
+            System.out.println("❌ Erreur lors de l'ajout : " + e.getMessage());
         }
     }
 
@@ -37,13 +37,13 @@ public class ClientDAO {
         String sql = "SELECT * FROM CLIENT ORDER BY nom, prenom";
 
         try (Statement st = DatabaseConnection.getConnection().createStatement();
-             Result r = st.executeQuery(sql)) {
+             ResultSet r  = st.executeQuery(sql)) {
 
             while (r.next()) {
-                clients.add(Client(r));
+                clients.add(mapToClient(r));
             }
         } catch (SQLException e) {
-            System.out.println("❌ Erreur lor de la récupération : " + e.getMessage());
+            System.out.println("❌ Erreur lors de la récupération : " + e.getMessage());
         }
         return clients;
     }
@@ -56,12 +56,12 @@ public class ClientDAO {
 
         try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement(sql)) {
             ps.setString(1, telephone);
-            Result r = ps.executeQuery();
+            ResultSet r = ps.executeQuery();
             if (r.next()) {
-                return Client(r);
+                return mapToClient(r);
             }
         } catch (SQLException e) {
-            System.out.println("❌ Erreur lor de la recherche : " + e.getMessage());
+            System.out.println("❌ Erreur lors de la recherche : " + e.getMessage());
         }
         return null;
     }
@@ -74,12 +74,12 @@ public class ClientDAO {
 
         try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement(sql)) {
             ps.setInt(1, id);
-            Result r = ps.executeQuery();
+            ResultSet r = ps.executeQuery();
             if (r.next()) {
-                return Client(r);
+                return mapToClient(r);
             }
         } catch (SQLException e) {
-            System.out.println("❌ Erreur lor de la recherche : " + e.getMessage());
+            System.out.println("❌ Erreur lors de la recherche : " + e.getMessage());
         }
         return null;
     }
@@ -87,7 +87,7 @@ public class ClientDAO {
     // -------------------------------------------------------
     //  Convertir une ligne SQL en objet Client
     // -------------------------------------------------------
-    private Client Client(Result r) throws SQLException {
+    private Client mapToClient(ResultSet r) throws SQLException {
         Client client = new Client(
             r.getString("nom"),
             r.getString("prenom"),

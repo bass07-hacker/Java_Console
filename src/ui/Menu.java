@@ -30,7 +30,7 @@ public class Menu {
     private void displayHeader() {
         ConsoleUI.clearScreen();
         System.out.println(ConsoleUI.BOLD_GREEN);
-        System.out.println("╔" + "═".repeat(108) + "╗");
+        System.out.println("╔" + "═".repeat(100) + "╗");
         System.out.println("║ ███╗   ███╗ ██████╗ ██████╗ ██╗██╗     ███████╗    ███╗   ███╗ ██████╗ ███╗   ██╗███████╗██╗   ██╗ ║");
         System.out.println("║ ████╗ ████║██╔═══██╗██╔══██╗██║██║     ██╔════╝    ████╗ ████║██╔═══██╗████╗  ██║██╔════╝╚██╗ ██╔╝ ║");
         System.out.println("║ ██╔████╔██║██║   ██║██████╔╝██║██║     █████╗      ██╔████╔██║██║   ██║██╔██╗ ██║█████╗   ╚████╔╝  ║");
@@ -39,7 +39,7 @@ public class Menu {
         System.out.println("║ ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚═╝╚══════╝╚══════╝    ╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝   ╚═╝    ║");
         System.out.println("║                                                                                                    ║");
         System.out.println("║                             SÉCURISÉ • RAPIDE • FIABLE • v2.0                                      ║");
-        System.out.println("╚" + "═".repeat(108) + "╝");
+        System.out.println("╚" + "═".repeat(100) + "╝");
         System.out.println(ConsoleUI.RESET);
     }
 

@@ -49,22 +49,22 @@ public class ConsoleUI {
      * Affiche un en-tête de section stylé.
      */
     public static void printHeader(String title) {
-        System.out.println(WHITE + "\n" + "═".repeat(50));
+        System.out.println(WHITE + "\n" + "═".repeat(55));
         System.out.println("  " + title.toUpperCase());
-        System.out.println("═".repeat(50) + RESET);
+        System.out.println("═".repeat(55) + RESET);
     }
 
     /**
      * Affiche un message de succès premium.
      */
     public static void printSuccess(String message) {
-        System.out.println(BOLD_GREEN + "\n[✔] SUCCESS: " + message + RESET);
+        System.out.println(BOLD_GREEN + "\n[✔ ] SUCCESS: " + message + RESET);
     }
 
     /**
      * Affiche un message d'erreur premium.
      */
     public static void printError(String message) {
-        System.out.println(RED + "\n[✘] ERROR: " + message + RESET);
+        System.out.println(RED + "\n[✘ ] ERROR: " + message + RESET);
     }
 }

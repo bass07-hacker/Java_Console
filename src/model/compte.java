@@ -1,53 +1,41 @@
 package model;
+
 public class Compte {
-        private int id;
-        private int Numero_compte;
-        private int solde;
-        private String nom_Client;
+    private int    id;
+    private String numeroCompte;   // String, pas int
+    private double solde;          // double, pas int
+    private Client client;         // référence Client, pas juste le nom
 
+    public Compte() {}
 
+    public Compte(String numeroCompte, double solde, Client client) {
+        this.numeroCompte = numeroCompte;
+        this.solde        = solde;
+        this.client       = client;
+    }
 
-        public Compte() {
-        }
+    public Compte(int id, String numeroCompte, double solde, Client client) {
+        this.id           = id;
+        this.numeroCompte = numeroCompte;
+        this.solde        = solde;
+        this.client       = client;
+    }
 
-        public Compte(int id, String nom_Client, int Numero_compte, int solde) {
-            this.id = id;
-            this.nom_Client = nom_Client;
-            this.Numero_compte = Numero_compte;
-            this.solde = solde;
-        }
+    public int    getId()          { return id; }
+    public void   setId(int id)    { this.id = id; }
 
-        public int getId() {
-            return id;
-        }
-        public void setId(int id) {
-            this.id = id;
-        }
+    public String getNumeroCompte()                    { return numeroCompte; }
+    public void   setNumeroCompte(String numeroCompte) { this.numeroCompte = numeroCompte; }
 
-        public String getNom_Client() {
-            return nom_Client;
-        }
-        public void setNom_Client(String nom_Client) {
-            this.nom_Client = nom_Client;
-        }
+    public double getSolde()             { return solde; }
+    public void   setSolde(double solde) { this.solde = solde; }
 
-        public int getNumero_compte() {
-            return Numero_compte;
-        }
-        public void setNumero_compte(int Numero_compte) {
-            this.Numero_compte = Numero_compte;
-        }
+    public Client getClient()              { return client; }
+    public void   setClient(Client client) { this.client = client; }
 
-        public int getSolde() {
-            return solde;
-        }
-        public void setSolde(int solde) {
-            this.solde = solde;
-        }
-
-        
-
+    @Override
+    public String toString() {
+        return "Compte{id=" + id + ", numero='" + numeroCompte +
+               "', solde=" + solde + "}";
+    }
 }
-   
-
-
