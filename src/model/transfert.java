@@ -1,47 +1,22 @@
 package model;
-public class Transfert {
-    private int source;
-    private int destination;
-    private double montant;
-    private String date;
-    private String type="Transfert";
+
+public class Transfert extends Operation {
+    private Compte compteSource;
+    private Compte compteDestination;
 
     public Transfert() {
+        super("TRANSFERT");
     }
 
-    public Transfert(int source, int destination, double montant, String date) {
-        this.source = source;
-        this.destination = destination;
-        this.montant = montant;
-        this.date = date;
+    public Transfert(double montant, Compte compteSource, Compte compteDestination) {
+        super("TRANSFERT", montant);
+        this.compteSource      = compteSource;
+        this.compteDestination = compteDestination;
     }
 
-    public int getSource() {
-        return source;
-    }
-    public void setSource(int source) {
-        this.source = source;
-    }
+    public Compte getCompteSource()                        { return compteSource; }
+    public void   setCompteSource(Compte compteSource)     { this.compteSource = compteSource; }
 
-    public int getDestination() {
-        return destination;
-    }
-    public void setDestination(int destination) {
-        this.destination = destination;
-    }
-
-    public double getMontant() {
-        return montant;
-    }
-    public void setMontant(double montant) {
-        this.montant = montant;
-    }
-
-    public String getDate() {
-        return date;
-    }
-    public void setDate(String date) {
-        this.date = date;
-    }
-
+    public Compte getCompteDestination()                         { return compteDestination; }
+    public void   setCompteDestination(Compte compteDestination) { this.compteDestination = compteDestination; }
 }

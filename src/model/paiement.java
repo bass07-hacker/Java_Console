@@ -1,47 +1,22 @@
 package model;
-public class Paiement {
-    private int Numero_compte;
-    private String Nom_Marchand;
-    private double montant;
-    private String date;
-    private String type="Paiement";
+
+public class Paiement extends Operation {
+    private Compte compteSource;
+    private String nomMarchand;
 
     public Paiement() {
+        super("PAIEMENT");
     }
 
-    public Paiement(int source, int destination, double montant, String date) {
-        this.source = source;
-        this.destination = destination;
-        this.montant = montant;
-        this.date = date;
+    public Paiement(double montant, Compte compteSource, String nomMarchand) {
+        super("PAIEMENT", montant);
+        this.compteSource = compteSource;
+        this.nomMarchand  = nomMarchand;
     }
 
-    public int getSource() {
-        return source;
-    }
-    public void setSource(int source) {
-        this.source = source;
-    }
+    public Compte getCompteSource()                    { return compteSource; }
+    public void   setCompteSource(Compte compteSource) { this.compteSource = compteSource; }
 
-    public int getDestination() {
-        return destination;
-    }
-    public void setDestination(int destination) {
-        this.destination = destination;
-    }
-
-    public double getMontant() {
-        return montant;
-    }
-    public void setMontant(double montant) {
-        this.montant = montant;
-    }
-
-    public String getDate() {
-        return date;
-    }
-    public void setDate(String date) {
-        this.date = date;
-    }
-
+    public String getNomMarchand()                   { return nomMarchand; }
+    public void   setNomMarchand(String nomMarchand) { this.nomMarchand = nomMarchand; }
 }

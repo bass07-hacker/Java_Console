@@ -45,7 +45,7 @@ public class OperationDAO {
 
             P.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("❌ Erreur lor de l'enregistrement : " + e.getMessage());
+            System.out.println("❌ Erreur lors de l'enregistrement : " + e.getMessage());
         }
     }
 
@@ -53,26 +53,27 @@ public class OperationDAO {
     //  Récupérer toutes les opérations
     // -------------------------------------------------------
     public List<Operation> findAll() {
-        List<Operation> operation = new ArrayList<>();
+        List<Operation> operations = new ArrayList<>();
         String sql = "SELECT * FROM OPERATION ORDER BY date_operation DESC";
 
         try (Statement st = DatabaseConnection.getConnection().createStatement();
-             Result r = st.executeQuery(sql)) {
+             ResultSet r  = st.executeQuery(sql)) {
 
             while (r.next()) {
-                operation.add(Operation(r));
+                Operation op = mapToOperation(r);
+                if (op != null) operations.add(op);
             }
         } catch (SQLException e) {
             System.out.println("❌ Erreur : " + e.getMessage());
         }
-        return operation;
+        return operations;
     }
 
     // -------------------------------------------------------
     //  Récupérer les opérations d'un compte
     // -------------------------------------------------------
     public List<Operation> findByCompte(String numeroCompte) {
-        List<Operation> operation = new ArrayList<>();
+        List<Operation> operations = new ArrayList<>();
         String sql = "SELECT * FROM OPERATION " +
                      "WHERE compte_source = ? OR compte_destination = ? " +
                      "ORDER BY date_operation DESC";
@@ -80,31 +81,32 @@ public class OperationDAO {
         try (PreparedStatement P = DatabaseConnection.getConnection().prepareStatement(sql)) {
             P.setString(1, numeroCompte);
             P.setString(2, numeroCompte);
-            Result r = P.executeQuery();
+            ResultSet r = P.executeQuery();
 
             while (r.next()) {
-                operation.add(Operation(r));
+                Operation op = mapToOperation(r);
+                if (op != null) operations.add(op);
             }
         } catch (SQLException e) {
             System.out.println("❌ Erreur : " + e.getMessage());
         }
-        return operation;
+        return operations;
     }
 
     // -------------------------------------------------------
     //  Convertir une ligne SQL en objet Operation
     // -------------------------------------------------------
-    private Operation Operation(Result r) throws SQLException {
-        String type    = r.getString("type_operation");
-        double montant = r.getDouble("montant");
-        LocalDate date = r.getDate("date_operation").toLocalDate();
-        String src     = r.getString("compte_source");
-        String dest    = r.getString("compte_destination");
-        String marchand = r.getString("marchand");
+    private Operation mapToOperation(ResultSet r) throws SQLException {
+        String    type     = r.getString("type_operation");
+        double    montant  = r.getDouble("montant");
+        LocalDate date     = r.getDate("date_operation").toLocalDate();
+        String    src      = r.getString("compte_source");
+        String    dest     = r.getString("compte_destination");
+        String    marchand = r.getString("marchand");
 
-        // On crée des comptes léger juste pour l'affichage
-        Compte compteSource      = src     != null ? new Compte(src,     0, null) : null;
-        Compte compteDestination = dest    != null ? new Compte(dest,    0, null) : null;
+        // Comptes légers juste pour l'affichage (sans client)
+        Compte compteSource      = src  != null ? new Compte(src,  0, null) : null;
+        Compte compteDestination = dest != null ? new Compte(dest, 0, null) : null;
 
         Operation op;
         switch (type) {
