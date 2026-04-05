@@ -70,7 +70,8 @@ public class Menu {
                 case 6 -> compteMenu.showTransfert();
                 case 7 -> compteMenu.showPaiementMarchand();
                 case 8 -> compteMenu.showHistory();
-                case 9 -> {
+                case 9 -> compteMenu.showRechercheParDate();
+                case 10 -> {
                     ConsoleUI.showProgressBar("SHUTTING DOWN SYSTEM");
                     System.out.println(ConsoleUI.YELLOW + "\n[INFO] Déconnexion sécurisée...");
                     System.out.println("Merci d'avoir utilisé Mobile Money Premium. À bientôt !");
@@ -79,7 +80,7 @@ public class Menu {
                 default -> ConsoleUI.printError("Option invalide.");
             }
             
-            if (running) {
+            if (running && choice != 10) {
                 System.out.println("\n" + ConsoleUI.CYAN + "Appuyez sur Entrée pour revenir au menu principal..." + ConsoleUI.RESET);
                 scanner.nextLine();
                 displayHeader();
@@ -99,7 +100,8 @@ public class Menu {
         System.out.println("  " + ConsoleUI.GREEN + "6" + ConsoleUI.RESET + " ➜ Transfert de fonds");
         System.out.println("  " + ConsoleUI.GREEN + "7" + ConsoleUI.RESET + " ➜ Paiement marchand");
         System.out.println("  " + ConsoleUI.GREEN + "8" + ConsoleUI.RESET + " ➜ Historique des opérations");
-        System.out.println("  " + ConsoleUI.RED + "9" + ConsoleUI.RESET + " ➜ Quitter");
+        System.out.println("  " + ConsoleUI.GREEN + "9" + ConsoleUI.RESET + " ➜ Rechercher opérations par date");
+        System.out.println("  " + ConsoleUI.RED + "10" + ConsoleUI.RESET + " ➜ Quitter");
         System.out.println(ConsoleUI.WHITE + "  " + "─".repeat(45) + ConsoleUI.RESET);
     }
 }

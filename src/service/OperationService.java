@@ -11,6 +11,7 @@ import model.Paiement;
 import exception.SoldeInsuffisantException;
 import exception.CompteIntrouvableException;
 import java.util.List;
+import java.time.LocalDate;
 
 public class OperationService {
     private final CompteDAO    compteDAO;
@@ -74,6 +75,15 @@ public class OperationService {
     public List<Operation> listOperations(String numero) throws CompteIntrouvableException {
         findCompte(numero);
         return operationDAO.findByCompte(numero);
+    }
+
+    // -------------------------------------------------------
+    //  Rechercher les opérations d'un compte par date
+    // -------------------------------------------------------
+    public List<Operation> rechercherParDate(String numero, LocalDate date)
+            throws CompteIntrouvableException {
+        findCompte(numero);
+        return operationDAO.findByDate(numero, date);
     }
 
     private Compte findCompte(String numero) throws CompteIntrouvableException {

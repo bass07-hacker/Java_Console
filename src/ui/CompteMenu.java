@@ -158,4 +158,42 @@ public class CompteMenu {
             ConsoleUI.printError(e.getMessage());
         }
     }
+
+    // -------------------------------------------------------
+    //  Recherche opérations par date
+    // -------------------------------------------------------
+    public void showRechercheParDate() {
+        ConsoleUI.clearScreen();
+        ConsoleUI.printHeader("   RECHERCHE PAR DATE");
+
+        System.out.print(ConsoleUI.CYAN + "Numéro de compte : " + ConsoleUI.RESET);
+        String num = scanner.nextLine();
+
+        System.out.print(ConsoleUI.CYAN + "Date (AAAA-MM-JJ) : " + ConsoleUI.RESET);
+        String dateStr = scanner.nextLine();
+
+        ConsoleUI.showProgressBar("RECHERCHE EN COURS");
+
+        try {
+            java.time.LocalDate date = java.time.LocalDate.parse(dateStr);
+            List<Operation> operations = operationService.rechercherParDate(num, date);
+            if (operations.isEmpty()) {
+                System.out.println(ConsoleUI.YELLOW + "Aucune opération trouvée pour cette date." + ConsoleUI.RESET);
+            } else {
+                System.out.println(ConsoleUI.BOLD_GREEN +
+                    String.format("%-15s | %-25s | %-15s", "DATE", "TYPE", "MONTANT") + ConsoleUI.RESET);
+                System.out.println(ConsoleUI.WHITE + "-".repeat(60) + ConsoleUI.RESET);
+                for (Operation op : operations) {
+                    System.out.printf("%-15s | %-25s | %-15s\n",
+                        op.getDateOperation().toString(),
+                        op.getTypeOperation(),
+                        formatCurrency(op.getMontant()));
+                }
+            }
+        } catch (java.time.format.DateTimeParseException e) {
+            ConsoleUI.printError("Format invalide. Utilisez AAAA-MM-JJ (ex: 2026-04-01).");
+        } catch (CompteIntrouvableException e) {
+            ConsoleUI.printError(e.getMessage());
+        }
+    }
 }

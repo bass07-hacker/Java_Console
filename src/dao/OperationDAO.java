@@ -94,6 +94,31 @@ public class OperationDAO {
     }
 
     // -------------------------------------------------------
+    //  Récupérer les opérations d'un compte filtrées par date
+    // -------------------------------------------------------
+    public List<Operation> findByDate(String numeroCompte, LocalDate date) {
+        List<Operation> operations = new ArrayList<>();
+        String sql = "SELECT * FROM OPERATION " +
+                     "WHERE (compte_source = ? OR compte_destination = ?) " +
+                     "AND date_operation = ? " +
+                     "ORDER BY date_operation DESC";
+
+        try (PreparedStatement P = DatabaseConnection.getConnection().prepareStatement(sql)) {
+            P.setString(1, numeroCompte);
+            P.setString(2, numeroCompte);
+            P.setDate(3, Date.valueOf(date));
+            ResultSet r = P.executeQuery();
+            while (r.next()) {
+                Operation op = mapToOperation(r);
+                if (op != null) operations.add(op);
+            }
+        } catch (SQLException e) {
+            System.out.println("❌ Erreur recherche par date : " + e.getMessage());
+        }
+        return operations;
+    }
+
+    // -------------------------------------------------------
     //  Convertir une ligne SQL en objet Operation
     // -------------------------------------------------------
     private Operation mapToOperation(ResultSet r) throws SQLException {
