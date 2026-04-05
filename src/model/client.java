@@ -1,5 +1,5 @@
 package model;
-public class Client (){
+public class Client {
         private int id;
         private int Numero_telephone;
         private String nom;
