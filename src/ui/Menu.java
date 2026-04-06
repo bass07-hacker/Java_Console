@@ -72,7 +72,7 @@ public class Menu {
                 case 8 -> compteMenu.showHistory();
                 case 9 -> compteMenu.showRechercheParDate();
                 case 10 -> {
-                    ConsoleUI.showProgressBar("SHUTTING DOWN SYSTEM");
+                    ConsoleUI.showProgressBar("ARRET EN COURS");
                     System.out.println(ConsoleUI.YELLOW + "\n[INFO] Déconnexion sécurisée...");
                     System.out.println("Merci d'avoir utilisé Mobile Money Premium. À bientôt !");
                     running = false;

@@ -25,20 +25,17 @@ public class OperationService {
     public void depot(String numero, double montant) throws CompteIntrouvableException {
         Compte compte = findCompte(numero);
         compte.setSolde(compte.getSolde() + montant);
-        compteDAO.updateSolde(compte);   // updateSolde(), pas update()
-
-        operationDAO.enregistrer(new Depot(montant, compte));  // enregistrer(), pas save()
+        compteDAO.updateSolde(compte);
+        operationDAO.enregistrer(new Depot(montant, compte));
     }
 
     public void retrait(String numero, double montant)
             throws CompteIntrouvableException, SoldeInsuffisantException {
         Compte compte = findCompte(numero);
-        if (compte.getSolde() < montant) {
+        if (compte.getSolde() < montant)
             throw new SoldeInsuffisantException("Solde insuffisant pour retirer " + montant + " FCFA.");
-        }
         compte.setSolde(compte.getSolde() - montant);
         compteDAO.updateSolde(compte);
-
         operationDAO.enregistrer(new Retrait(montant, compte));
     }
 
@@ -47,29 +44,41 @@ public class OperationService {
         Compte source = findCompte(numSource);
         Compte dest   = findCompte(numDest);
 
-        if (source.getSolde() < montant) {
+        if (source.getSolde() < montant)
             throw new SoldeInsuffisantException("Solde insuffisant pour transférer " + montant + " FCFA.");
-        }
 
         source.setSolde(source.getSolde() - montant);
         compteDAO.updateSolde(source);
-
         dest.setSolde(dest.getSolde() + montant);
         compteDAO.updateSolde(dest);
-
         operationDAO.enregistrer(new Transfert(montant, source, dest));
     }
 
-    public void paiementMarchand(String numero, String codeMarchand, double montant)
+    // Vérifie que le marchand existe ET est de type MARCHAND
+    public void paiementMarchand(String numeroClient, String codeMarchand, double montant)
             throws CompteIntrouvableException, SoldeInsuffisantException {
-        Compte compte = findCompte(numero);
-        if (compte.getSolde() < montant) {
-            throw new SoldeInsuffisantException("Solde insuffisant pour le paiement de " + montant + " FCFA.");
-        }
-        compte.setSolde(compte.getSolde() - montant);
-        compteDAO.updateSolde(compte);
 
-        operationDAO.enregistrer(new Paiement(montant, compte, codeMarchand));
+        Compte compteClient = findCompte(numeroClient);
+
+        Compte compteMarchand = compteDAO.findByNumero(codeMarchand);
+        if (compteMarchand == null)
+            throw new CompteIntrouvableException(
+                "Le marchand '" + codeMarchand + "' n'existe pas dans le système.");
+
+        if (!compteMarchand.isMarchand())
+            throw new CompteIntrouvableException(
+                "Le compte '" + codeMarchand + "' n'est pas un compte marchand.");
+
+        if (compteClient.getSolde() < montant)
+            throw new SoldeInsuffisantException("Solde insuffisant pour le paiement de " + montant + " FCFA.");
+
+        compteClient.setSolde(compteClient.getSolde() - montant);
+        compteDAO.updateSolde(compteClient);
+
+        compteMarchand.setSolde(compteMarchand.getSolde() + montant);
+        compteDAO.updateSolde(compteMarchand);
+
+        operationDAO.enregistrer(new Paiement(montant, compteClient, codeMarchand));
     }
 
     public List<Operation> listOperations(String numero) throws CompteIntrouvableException {
@@ -77,9 +86,6 @@ public class OperationService {
         return operationDAO.findByCompte(numero);
     }
 
-    // -------------------------------------------------------
-    //  Rechercher les opérations d'un compte par date
-    // -------------------------------------------------------
     public List<Operation> rechercherParDate(String numero, LocalDate date)
             throws CompteIntrouvableException {
         findCompte(numero);
@@ -88,7 +94,8 @@ public class OperationService {
 
     private Compte findCompte(String numero) throws CompteIntrouvableException {
         Compte c = compteDAO.findByNumero(numero);
-        if (c == null) throw new CompteIntrouvableException("Compte " + numero + " introuvable.");
+        if (c == null)
+            throw new CompteIntrouvableException("Compte " + numero + " introuvable.");
         return c;
     }
 }

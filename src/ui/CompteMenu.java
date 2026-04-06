@@ -1,5 +1,4 @@
 package ui;
-import java.sql.Date;
 
 import service.CompteService;
 import service.OperationService;
@@ -8,13 +7,11 @@ import exception.SoldeInsuffisantException;
 import exception.CompteIntrouvableException;
 import java.util.Scanner;
 import java.util.List;
-import java.text.SimpleDateFormat;
 
 public class CompteMenu {
     private final CompteService    compteService;
     private final OperationService operationService;
     private final Scanner          scanner;
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     public CompteMenu(CompteService compteService, OperationService operationService, Scanner scanner) {
         this.compteService    = compteService;
@@ -22,39 +19,92 @@ public class CompteMenu {
         this.scanner          = scanner;
     }
 
+    // -------------------------------------------------------
+    //  Helpers saisie sécurisée
+    // -------------------------------------------------------
+    private int saisiEntier(String label) {
+        while (true) {
+            System.out.print(ConsoleUI.CYAN + label + ConsoleUI.RESET);
+            try {
+                return Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException e) {
+                ConsoleUI.printError("Valeur invalide. Veuillez saisir un nombre entier.");
+            }
+        }
+    }
+
+    private double saisiDecimal(String label) {
+        while (true) {
+            System.out.print(ConsoleUI.CYAN + label + ConsoleUI.RESET);
+            try {
+                double v = Double.parseDouble(scanner.nextLine().trim());
+                if (v <= 0) { ConsoleUI.printError("Le montant doit être supérieur à 0."); continue; }
+                return v;
+            } catch (NumberFormatException e) {
+                ConsoleUI.printError("Valeur invalide. Veuillez saisir un montant (ex: 5000).");
+            }
+        }
+    }
+
     private String formatCurrency(double amount) {
         return ConsoleUI.BOLD_GREEN + String.format("%,.0f FCFA", amount).replace(",", " ") + ConsoleUI.RESET;
     }
 
+    // -------------------------------------------------------
+    //  Menu visuel type de compte
+    // -------------------------------------------------------
+    private String choisirTypeCompte() {
+        while (true) {
+            System.out.println();
+            System.out.println(ConsoleUI.WHITE + "  ┌─────────────────────────────┐");
+            System.out.println("  │     TYPE DE COMPTE          │");
+            System.out.println("  ├─────────────────────────────┤");
+            System.out.println("  │  " + ConsoleUI.GREEN + "1" + ConsoleUI.WHITE + "  ➜  Compte CLIENT        │");
+            System.out.println("  │  " + ConsoleUI.GREEN + "2" + ConsoleUI.WHITE + "  ➜  Compte MARCHAND      │");
+            System.out.println("  └─────────────────────────────┘" + ConsoleUI.RESET);
+            System.out.print(ConsoleUI.CYAN + "  Votre choix : " + ConsoleUI.RESET);
+            switch (scanner.nextLine().trim()) {
+                case "1": return "CLIENT";
+                case "2": return "MARCHAND";
+                default:  ConsoleUI.printError("Choix invalide. Tapez 1 ou 2.");
+            }
+        }
+    }
+
+    // -------------------------------------------------------
+    //  Création de compte
+    // -------------------------------------------------------
     public void showCreateAccount() {
         ConsoleUI.clearScreen();
         ConsoleUI.printHeader("     CRÉATION DE COMPTE");
 
-        System.out.print(ConsoleUI.CYAN + "ID Client propriétaire : " + ConsoleUI.RESET);
-        int clientId = Integer.parseInt(scanner.nextLine());
+        int    clientId   = saisiEntier("ID du propriétaire : ");
         System.out.print(ConsoleUI.CYAN + "Numéro de compte (ex: ACC-001) : " + ConsoleUI.RESET);
-        String numero = scanner.nextLine();
-        System.out.print(ConsoleUI.CYAN + "Solde initial : " + ConsoleUI.RESET);
-        double solde = Double.parseDouble(scanner.nextLine());
+        String numero     = scanner.nextLine().trim();
+        double solde      = saisiDecimal("Solde initial : ");
+        String typeCompte = choisirTypeCompte();
 
         ConsoleUI.showProgressBar("GÉNÉRATION DU COMPTE");
 
         try {
-            compteService.createAccount(clientId, numero, solde);
-            ConsoleUI.printSuccess("Compte n° " + numero + " créé avec succès.");
-        } catch (Exception e) {
+            compteService.createAccount(clientId, numero, solde, typeCompte);
+            ConsoleUI.printSuccess("Compte " + typeCompte + " n° " + numero + " créé avec succès.");
+        } catch (CompteIntrouvableException e) {
+            // Client introuvable → affiche l'erreur, PAS de succès
             ConsoleUI.printError(e.getMessage());
         }
     }
 
+    // -------------------------------------------------------
+    //  Dépôt
+    // -------------------------------------------------------
     public void showDepot() {
         ConsoleUI.clearScreen();
         ConsoleUI.printHeader("      DÉPÔT D'ARGENT");
 
         System.out.print(ConsoleUI.CYAN + "Numéro de compte : " + ConsoleUI.RESET);
-        String num = scanner.nextLine();
-        System.out.print(ConsoleUI.CYAN + "Montant à déposer : " + ConsoleUI.RESET);
-        double montant = Double.parseDouble(scanner.nextLine());
+        String num     = scanner.nextLine().trim();
+        double montant = saisiDecimal("Montant à déposer : ");
 
         ConsoleUI.showProgressBar("TRAITEMENT DU DÉPÔT");
 
@@ -66,14 +116,16 @@ public class CompteMenu {
         }
     }
 
+    // -------------------------------------------------------
+    //  Retrait
+    // -------------------------------------------------------
     public void showRetrait() {
         ConsoleUI.clearScreen();
         ConsoleUI.printHeader("     RETRAIT D'ARGENT");
 
         System.out.print(ConsoleUI.CYAN + "Numéro de compte : " + ConsoleUI.RESET);
-        String num = scanner.nextLine();
-        System.out.print(ConsoleUI.CYAN + "Montant à retirer : " + ConsoleUI.RESET);
-        double montant = Double.parseDouble(scanner.nextLine());
+        String num     = scanner.nextLine().trim();
+        double montant = saisiDecimal("Montant à retirer : ");
 
         ConsoleUI.showProgressBar("VÉRIFICATION DU SOLDE ET RETRAIT");
 
@@ -85,16 +137,18 @@ public class CompteMenu {
         }
     }
 
+    // -------------------------------------------------------
+    //  Transfert
+    // -------------------------------------------------------
     public void showTransfert() {
         ConsoleUI.clearScreen();
         ConsoleUI.printHeader("     TRANSFERT DE FONDS");
 
         System.out.print(ConsoleUI.CYAN + "Numéro compte source : " + ConsoleUI.RESET);
-        String src = scanner.nextLine();
+        String src     = scanner.nextLine().trim();
         System.out.print(ConsoleUI.CYAN + "Numéro compte destination : " + ConsoleUI.RESET);
-        String dst = scanner.nextLine();
-        System.out.print(ConsoleUI.CYAN + "Montant à transférer : " + ConsoleUI.RESET);
-        double montant = Double.parseDouble(scanner.nextLine());
+        String dst     = scanner.nextLine().trim();
+        double montant = saisiDecimal("Montant à transférer : ");
 
         ConsoleUI.showProgressBar("SÉCURISATION DU TRANSFERT");
 
@@ -106,16 +160,18 @@ public class CompteMenu {
         }
     }
 
+    // -------------------------------------------------------
+    //  Paiement marchand
+    // -------------------------------------------------------
     public void showPaiementMarchand() {
         ConsoleUI.clearScreen();
         ConsoleUI.printHeader("     PAIEMENT MARCHAND");
 
-        System.out.print(ConsoleUI.CYAN + "Numéro de compte : " + ConsoleUI.RESET);
-        String num = scanner.nextLine();
-        System.out.print(ConsoleUI.CYAN + "Code Marchand : " + ConsoleUI.RESET);
-        String code = scanner.nextLine();
-        System.out.print(ConsoleUI.CYAN + "Montant : " + ConsoleUI.RESET);
-        double montant = Double.parseDouble(scanner.nextLine());
+        System.out.print(ConsoleUI.CYAN + "Numéro de votre compte : " + ConsoleUI.RESET);
+        String num     = scanner.nextLine().trim();
+        System.out.print(ConsoleUI.CYAN + "Numéro du compte marchand : " + ConsoleUI.RESET);
+        String code    = scanner.nextLine().trim();
+        double montant = saisiDecimal("Montant : ");
 
         ConsoleUI.showProgressBar("VALIDATION DU PAIEMENT");
 
@@ -127,73 +183,70 @@ public class CompteMenu {
         }
     }
 
+    // -------------------------------------------------------
+    //  Historique
+    // -------------------------------------------------------
     public void showHistory() {
         ConsoleUI.clearScreen();
         ConsoleUI.printHeader("   HISTORIQUE DES OPÉRATIONS");
 
         System.out.print(ConsoleUI.CYAN + "Numéro de compte : " + ConsoleUI.RESET);
-        String num = scanner.nextLine();
+        String num = scanner.nextLine().trim();
 
         ConsoleUI.showProgressBar("EXTRACTION DES DONNÉES");
 
         try {
-            List<Operation> operations = operationService.listOperations(num);
-            if (operations.isEmpty()) {
-                System.out.println(ConsoleUI.YELLOW + "Aucune opération trouvée pour ce compte." + ConsoleUI.RESET);
-            } else {
-                System.out.println(ConsoleUI.BOLD_GREEN +
-                    String.format("%-15s | %-25s | %-15s", "DATE", "TYPE", "MONTANT") + ConsoleUI.RESET);
-                System.out.println(ConsoleUI.WHITE + "-".repeat(60) + ConsoleUI.RESET);
-                for (Operation op : operations) {
-                    // getDateOperation() → LocalDate → on formate avec toString()
-                    // getTypeOperation() au lieu de getType()
-                    // getMontant() est correct
-                    System.out.printf("%-15s | %-25s | %-15s\n",
-                        op.getDateOperation().toString(),
-                        op.getTypeOperation(),
-                        formatCurrency(op.getMontant()));
-                }
-            }
+            afficherOperations(operationService.listOperations(num));
         } catch (CompteIntrouvableException e) {
             ConsoleUI.printError(e.getMessage());
         }
     }
 
     // -------------------------------------------------------
-    //  Recherche opérations par date
+    //  Recherche par date
     // -------------------------------------------------------
     public void showRechercheParDate() {
         ConsoleUI.clearScreen();
         ConsoleUI.printHeader("   RECHERCHE PAR DATE");
 
         System.out.print(ConsoleUI.CYAN + "Numéro de compte : " + ConsoleUI.RESET);
-        String num = scanner.nextLine();
+        String num = scanner.nextLine().trim();
 
-        System.out.print(ConsoleUI.CYAN + "Date (AAAA-MM-JJ) : " + ConsoleUI.RESET);
-        String dateStr = scanner.nextLine();
+        java.time.LocalDate date = null;
+        while (date == null) {
+            System.out.print(ConsoleUI.CYAN + "Date (AAAA-MM-JJ) : " + ConsoleUI.RESET);
+            try {
+                date = java.time.LocalDate.parse(scanner.nextLine().trim());
+            } catch (java.time.format.DateTimeParseException e) {
+                ConsoleUI.printError("Format invalide. Utilisez AAAA-MM-JJ (ex: 2026-04-01).");
+            }
+        }
 
         ConsoleUI.showProgressBar("RECHERCHE EN COURS");
 
         try {
-            java.time.LocalDate date = java.time.LocalDate.parse(dateStr);
-            List<Operation> operations = operationService.rechercherParDate(num, date);
-            if (operations.isEmpty()) {
-                System.out.println(ConsoleUI.YELLOW + "Aucune opération trouvée pour cette date." + ConsoleUI.RESET);
-            } else {
-                System.out.println(ConsoleUI.BOLD_GREEN +
-                    String.format("%-15s | %-25s | %-15s", "DATE", "TYPE", "MONTANT") + ConsoleUI.RESET);
-                System.out.println(ConsoleUI.WHITE + "-".repeat(60) + ConsoleUI.RESET);
-                for (Operation op : operations) {
-                    System.out.printf("%-15s | %-25s | %-15s\n",
-                        op.getDateOperation().toString(),
-                        op.getTypeOperation(),
-                        formatCurrency(op.getMontant()));
-                }
-            }
-        } catch (java.time.format.DateTimeParseException e) {
-            ConsoleUI.printError("Format invalide. Utilisez AAAA-MM-JJ (ex: 2026-04-01).");
+            afficherOperations(operationService.rechercherParDate(num, date));
         } catch (CompteIntrouvableException e) {
             ConsoleUI.printError(e.getMessage());
+        }
+    }
+
+    // -------------------------------------------------------
+    //  Affichage tableau opérations
+    // -------------------------------------------------------
+    private void afficherOperations(List<Operation> operations) {
+        if (operations.isEmpty()) {
+            System.out.println(ConsoleUI.YELLOW + "Aucune opération trouvée." + ConsoleUI.RESET);
+        } else {
+            System.out.println(ConsoleUI.BOLD_GREEN +
+                String.format("%-15s | %-25s | %-15s", "DATE", "TYPE", "MONTANT") + ConsoleUI.RESET);
+            System.out.println(ConsoleUI.WHITE + "-".repeat(60) + ConsoleUI.RESET);
+            for (Operation op : operations) {
+                System.out.printf("%-15s | %-25s | %-15s\n",
+                    op.getDateOperation().toString(),
+                    op.getTypeOperation(),
+                    formatCurrency(op.getMontant()));
+            }
         }
     }
 }

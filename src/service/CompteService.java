@@ -1,6 +1,6 @@
 package service;
 
-import dao.CompteDAO;       // l'import était commenté !
+import dao.CompteDAO;
 import dao.ClientDAO;
 import model.Compte;
 import model.Client;
@@ -15,22 +15,24 @@ public class CompteService {
         this.clientDAO = new ClientDAO();
     }
 
-    // clientId (int) → on charge le Client depuis la BD pour construire Compte
-    public void createAccount(int clientId, String numero, double soldeInitial) {
+    // Lance une exception si le client n'existe pas
+    // → le menu catch l'erreur et affiche le bon message
+    public void createAccount(int clientId, String numero, double soldeInitial, String typeCompte)
+            throws CompteIntrouvableException {
+
         Client client = clientDAO.findById(clientId);
-        if (client == null) {
-            System.out.println("❌ Client introuvable avec l'id : " + clientId);
-            return;
-        }
-        Compte compte = new Compte(numero, soldeInitial, client);
-        compteDAO.creerCompte(compte);  // la méthode s'appelle creerCompte(), pas save()
+        if (client == null)
+            throw new CompteIntrouvableException(
+                "Aucun client trouvé avec l'ID " + clientId + ". Vérifiez et réessayez.");
+
+        Compte compte = new Compte(numero, soldeInitial, client, typeCompte);
+        compteDAO.creerCompte(compte);
     }
 
     public Compte findByNumero(String numero) throws CompteIntrouvableException {
         Compte c = compteDAO.findByNumero(numero);
-        if (c == null) {
+        if (c == null)
             throw new CompteIntrouvableException("Le compte n° " + numero + " est introuvable.");
-        }
         return c;
     }
 }

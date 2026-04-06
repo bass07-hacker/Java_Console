@@ -10,68 +10,51 @@ import java.util.List;
 
 public class CompteDAO {
 
-    // -------------------------------------------------------
-    //  Créer un compte en base
-    // -------------------------------------------------------
     public void creerCompte(Compte compte) {
-        String sql = "INSERT INTO COMPTE (numero_compte, solde, client_id) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO COMPTE (numero_compte, solde, client_id, type_compte) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement P = DatabaseConnection.getConnection().prepareStatement(sql)) {
             P.setString(1, compte.getNumeroCompte());
             P.setDouble(2, compte.getSolde());
             P.setInt(3, compte.getClient().getId());
+            P.setString(4, compte.getTypeCompte());
             P.executeUpdate();
-            System.out.println("✅ Compte créé avec succès. Numéro : " + compte.getNumeroCompte());
+            System.out.println("✅ Compte " + compte.getTypeCompte() + " créé. Numéro : " + compte.getNumeroCompte());
         } catch (SQLException e) {
             System.out.println("❌ Erreur lors de la création du compte : " + e.getMessage());
         }
     }
 
-    // -------------------------------------------------------
-    //  Rechercher un compte par numéro
-    // -------------------------------------------------------
     public Compte findByNumero(String numeroCompte) {
         String sql = "SELECT c.*, cl.nom, cl.prenom, cl.telephone, cl.adresse " +
-                     "FROM COMPTE c " +
-                     "JOIN CLIENT cl ON c.client_id = cl.id " +
+                     "FROM COMPTE c JOIN CLIENT cl ON c.client_id = cl.id " +
                      "WHERE c.numero_compte = ?";
 
         try (PreparedStatement P = DatabaseConnection.getConnection().prepareStatement(sql)) {
             P.setString(1, numeroCompte);
             ResultSet r = P.executeQuery();
-            if (r.next()) {
-                return mapToCompte(r);
-            }
+            if (r.next()) return mapToCompte(r);
         } catch (SQLException e) {
             System.out.println("❌ Erreur lors de la recherche : " + e.getMessage());
         }
         return null;
     }
 
-    // -------------------------------------------------------
-    //  Rechercher le compte d'un client par son id
-    // -------------------------------------------------------
     public Compte findByClientId(int clientId) {
         String sql = "SELECT c.*, cl.nom, cl.prenom, cl.telephone, cl.adresse " +
-                     "FROM COMPTE c " +
-                     "JOIN CLIENT cl ON c.client_id = cl.id " +
+                     "FROM COMPTE c JOIN CLIENT cl ON c.client_id = cl.id " +
                      "WHERE c.client_id = ?";
 
         try (PreparedStatement P = DatabaseConnection.getConnection().prepareStatement(sql)) {
             P.setInt(1, clientId);
             ResultSet r = P.executeQuery();
-            if (r.next()) {
-                return mapToCompte(r);
-            }
+            if (r.next()) return mapToCompte(r);
         } catch (SQLException e) {
             System.out.println("❌ Erreur lors de la recherche : " + e.getMessage());
         }
         return null;
     }
 
-    // -------------------------------------------------------
-    //  Récupérer tous les comptes
-    // -------------------------------------------------------
     public List<Compte> findAll() {
         List<Compte> comptes = new ArrayList<>();
         String sql = "SELECT c.*, cl.nom, cl.prenom, cl.telephone, cl.adresse " +
@@ -79,19 +62,13 @@ public class CompteDAO {
 
         try (Statement st = DatabaseConnection.getConnection().createStatement();
              ResultSet r  = st.executeQuery(sql)) {
-
-            while (r.next()) {
-                comptes.add(mapToCompte(r));
-            }
+            while (r.next()) comptes.add(mapToCompte(r));
         } catch (SQLException e) {
             System.out.println("❌ Erreur lors de la récupération : " + e.getMessage());
         }
         return comptes;
     }
 
-    // -------------------------------------------------------
-    //  Mettre à jour le solde d'un compte
-    // -------------------------------------------------------
     public void updateSolde(Compte compte) {
         String sql = "UPDATE COMPTE SET solde = ? WHERE numero_compte = ?";
 
@@ -104,9 +81,6 @@ public class CompteDAO {
         }
     }
 
-    // -------------------------------------------------------
-    //  Convertir une ligne SQL en objet Compte
-    // -------------------------------------------------------
     private Compte mapToCompte(ResultSet r) throws SQLException {
         Client client = new Client(
             r.getString("nom"),
@@ -116,10 +90,14 @@ public class CompteDAO {
         );
         client.setId(r.getInt("client_id"));
 
+        String type = r.getString("type_compte");
+        if (type == null) type = "CLIENT";
+
         Compte compte = new Compte(
             r.getString("numero_compte"),
             r.getDouble("solde"),
-            client
+            client,
+            type
         );
         compte.setId(r.getInt("id"));
         return compte;
