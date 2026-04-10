@@ -9,7 +9,7 @@ public class DatabaseConnection {
     // -------------------------------------------------------
     //  Paramètres de connexion — à modifier selon votre config
     // -------------------------------------------------------
-    private static final String URL      = "jdbc:mysql://localhost:3306/mobilemoney";
+    private static final String URL      = "jdbc:mysql://localhost:3306/mobile_money_db";
     private static final String USER     = "root";
     private static final String PASSWORD = "";      
 

@@ -1,5 +1,5 @@
-CREATE DATABASE Mobile_Money;
-USE Mobile_Money;
+CREATE DATABASE mobile_money_db;
+USE mobile_money_db;
 
 CREATE TABLE CLIENT (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -14,6 +14,7 @@ CREATE TABLE COMPTE (
     numero_compte VARCHAR(50) UNIQUE,
     solde DECIMAL(10,2),
     client_id INT,
+    type_compte VARCHAR(10)
     
     FOREIGN KEY (client_id) REFERENCES CLIENT(id)
 );
@@ -23,10 +24,7 @@ CREATE TABLE OPERATION (
     type_operation VARCHAR(50),
     montant DECIMAL(10,2),
     date_operation DATE,
-    compte_source INT,
-    compte_destination INT,
-    marchand VARCHAR(100),
-
-    FOREIGN KEY (compte_source) REFERENCES COMPTE(id),
-    FOREIGN KEY (compte_destination) REFERENCES COMPTE(id)
+    compte_source VARCHAR(50),
+    compte_destination VARCHAR(50),
+    marchand VARCHAR(100)
 );
